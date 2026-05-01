@@ -1,22 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "api/handler.cjs",
-      "use": "@vercel/node"
-    }
-  ],
   "routes": [
     {
-      "src": "/api/(.*)\.php",
+      "src": "/api/(.*)\\.php",
       "dest": "/api/handler.cjs?path=$1"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",

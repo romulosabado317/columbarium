@@ -29,13 +29,15 @@ const demoCredentials = {
   staff1: 'staff1'
 };
 
+const shouldUseSsl = process.env.DB_SSL !== 'false' || String(process.env.DB_HOST || '').includes('planetscale.com');
 const dbConfig = {
   host: process.env.DB_HOST || '',
   user: process.env.DB_USER || '',
   password: process.env.DB_PASS || '',
   database: process.env.DB_NAME || '',
   port: Number(process.env.DB_PORT || 3306),
-  decimalNumbers: true
+  decimalNumbers: true,
+  ssl: shouldUseSsl ? { rejectUnauthorized: true } : undefined
 };
 
 const schemaPath = path.resolve(__dirname, '..', 'database.sql');
@@ -54,10 +56,7 @@ async function createSchema() {
 
   try {
     connection = await mysql.createConnection({
-      host: dbConfig.host,
-      user: dbConfig.user,
-      password: dbConfig.password,
-      port: dbConfig.port,
+      ...dbConfig,
       multipleStatements: true
     });
 
