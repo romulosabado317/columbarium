@@ -15,7 +15,7 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)\.php",
+      "src": "/api/(.*)\\.php",
       "dest": "/api/handler.cjs?path=$1"
     },
     {
