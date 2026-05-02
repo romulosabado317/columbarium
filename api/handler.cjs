@@ -103,6 +103,20 @@ function parseBody(req) {
   });
 }
 
+function getApiPath(req) {
+  const rawUrl = req.url || '';
+  const host = (req.headers && (req.headers.host || 'localhost')) || 'localhost';
+  const url = new URL(rawUrl, `http://${host}`);
+  let path = url.searchParams.get('path') || '';
+  if (!path) {
+    path = url.pathname || '';
+    if (path.startsWith('/api/')) {
+      path = path.substring(5);
+    }
+  }
+  return path.replace(/\.php$/i, '').replace(/^\//, '');
+}
+
 function getNextId(items) {
   return items.reduce((max, item) => Math.max(max, Number(item.id) || 0), 0) + 1;
 }
@@ -163,11 +177,9 @@ async function verifyPassword(password, stored) {
 }
 
 module.exports = async function handler(req, res) {
-  const url = req.url || '';
-  const query = url.includes('?') ? url.split('?')[1] : '';
-  const params = new URLSearchParams(query);
-  const path = (params.get('path') || '').replace(/\.php$/i, '').replace(/^\//, '');
+  const path = getApiPath(req);
   const data = await parseBody(req);
+  console.log(`[API] ${req.method} ${req.url} -> ${path}`);
 
   if (req.method === 'OPTIONS') {
     return sendJson(res, { success: true });
