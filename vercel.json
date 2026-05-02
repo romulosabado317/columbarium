@@ -3,7 +3,7 @@
   "routes": [
     {
       "src": "/api/(.*)\\.php",
-      "dest": "/api/handler.cjs?path=$1"
+      "dest": "/api/[...slug].js?path=$1"
     },
     {
       "handle": "filesystem"
