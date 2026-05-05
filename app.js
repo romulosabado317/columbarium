@@ -254,6 +254,8 @@ const api = {
       const res = await fetch(url, options);
       const text = await res.text();
       if (!text || text.trim() === '') {
+        const fallbackResponse = getOfflineDemoResponse(url, options);
+        if (fallbackResponse) return fallbackResponse;
         return { error: `Empty response from server at ${url}. Check if the API is reachable.` };
       }
 
@@ -702,13 +704,6 @@ function renderAbout(container) {
              <div class="relative z-10">
                 <h3 class="text-xl md:text-2xl font-bold mb-4 font-serif">Mission & Vision</h3>
                 <p class="text-church-400 leading-relaxed mb-6 text-sm md:text-base">Providing a dignity-centered sanctuary for the faithful departed, fostering a space for prayer, remembrance, and community.</p>
-                <div class="pt-4 border-t border-church-800">
-                   <p class="text-[9px] uppercase font-bold text-church-600 mb-2 tracking-widest">System Access</p>
-                   <div class="space-y-1">
-                     <p class="text-[9px] md:text-[10px] font-mono text-church-300">Local (PC): http://localhost/columbarium</p>
-                     <p class="text-[9px] md:text-[10px] font-mono text-church-400 italic">Mobile: http://192.168.254.106/columbarium</p>
-                   </div>
-                </div>
              </div>
              <i data-lucide="church" class="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 opacity-50"></i>
           </div>
