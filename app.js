@@ -1344,31 +1344,59 @@ window.submitAppointmentRequest = async (e) => {
 window.submitNewNiche = async (e) => {
   e.preventDefault();
   const selectVal = document.getElementById('nicSecSelect').value;
-  const section = selectVal === 'NEW_SECTION' ? document.getElementById('nicSecNew').value : selectVal;
+  const section = selectVal === 'NEW_SECTION' ? document.getElementById('nicSecNew').value.trim() : selectVal;
   const id = document.getElementById('nicId').value.trim();
+  const row = Number(document.getElementById('nicRow').value);
+  const col = Number(document.getElementById('nicCol').value);
+  const price = Number(document.getElementById('nicPrice').value);
+  const capacity = Number(document.getElementById('nicCap').value);
 
-  // Client side duplicate check for better UX
-  if (state.niches.some(n => n.id.toLowerCase() === id.toLowerCase())) {
-      alert(`Error: Niche ID '${id}' already exists in the catalog.`);
-      return;
+  if (!section) {
+    alert('Please choose or enter a valid cluster section.');
+    return;
   }
-  
+  if (!id) {
+    alert('Niche ID is required.');
+    return;
+  }
+  if (!row || row < 1 || !col || col < 1) {
+    alert('Row and column must be positive numbers.');
+    return;
+  }
+  if (!price || price <= 0) {
+    alert('Please enter a valid price.');
+    return;
+  }
+  if (!capacity || capacity < 1) {
+    alert('Capacity must be at least 1.');
+    return;
+  }
+
+  if (state.niches.some(n => n.id.toLowerCase() === id.toLowerCase())) {
+    alert(`Error: Niche ID '${id}' already exists in the catalog.`);
+    return;
+  }
+
   const data = {
-    id: id,
-    section: section,
-    row: document.getElementById('nicRow').value,
-    col: document.getElementById('nicCol').value,
-    price: document.getElementById('nicPrice').value,
-    capacity: document.getElementById('nicCap').value
+    id,
+    section,
+    row,
+    col,
+    price,
+    capacity
   };
 
-  const res = await api.createNiche(data);
-  if(res.success) { 
-    alert("New Niche successfully integrated into " + section); 
-    loadData(); 
-    closeModal(); 
-  } else {
-    alert("Expansion failed: " + (res.error || "Ensure ID is unique"));
+  try {
+    const res = await api.createNiche(data);
+    if (res.success) {
+      alert(`New niche ${id} added to ${section}.`);
+      await loadData();
+      closeModal();
+    } else {
+      alert(`Expansion failed: ${res.error || 'Ensure ID is unique and all fields are valid.'}`);
+    }
+  } catch (err) {
+    alert(`Communication error: ${err.message || 'Server might be unreachable.'}`);
   }
 };
 
