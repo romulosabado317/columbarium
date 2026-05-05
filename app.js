@@ -396,8 +396,6 @@ function checkEnvironment() {
     banner.innerHTML = `
       <div class="flex items-center justify-center gap-4">
         <span><i data-lucide="info" class="w-3 h-3 inline mr-1"></i> Preview Mode</span>
-        <span class="opacity-50 text-[8px] border-l border-church-700 pl-4">Local URL: http://localhost/columbarium</span>
-        <span class="opacity-30 text-[7px] border-l border-church-700 pl-4">Mobile: http://192.168.254.106/columbarium</span>
       </div>
     `;
     document.body.prepend(banner);
@@ -862,8 +860,10 @@ function renderMapGridOnly() {
   if (!container) return;
   const filtered = state.niches.filter(n => n.section === state.map.section);
   
-  const rows = Math.max(2, ...filtered.map(n => n.row));
-  const cols = Math.max(5, ...filtered.map(n => n.col));
+  const rowValues = filtered.map(n => Number(n.row) || 0);
+  const colValues = filtered.map(n => Number(n.col) || 0);
+  const rows = filtered.length > 0 ? Math.max(2, ...rowValues) : 2;
+  const cols = filtered.length > 0 ? Math.max(5, ...colValues) : 5;
 
   container.style.display = 'grid';
   container.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
