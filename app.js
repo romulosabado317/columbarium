@@ -874,7 +874,9 @@ function renderMapGridOnly() {
     for (let c = 1; c <= cols; c++) {
       const niche = filtered.find(n => n.row === r && n.col === c);
       if (!niche) {
-        gridHTML += `<div class="w-24 h-24 rounded-xl bg-black/5 border border-dashed border-black/10 flex items-center justify-center opacity-20"><i data-lucide="plus" class="w-4 h-4"></i></div>`;
+        gridHTML += `<button type="button" onclick="openAddNicheModal('${state.map.section}', ${r}, ${c})" class="w-24 h-24 rounded-xl bg-black/5 border border-dashed border-black/10 flex items-center justify-center opacity-70 hover:opacity-100 transition-all">
+        <i data-lucide="plus" class="w-4 h-4"></i>
+      </button>`;
         continue;
       }
 
@@ -1241,6 +1243,32 @@ window.handleDeleteNiche = async (id) => {
   } else {
     alert("Deletion failed: " + (res.error || "Unknown error"));
   }
+};
+
+window.openAddNicheModal = (section, row, col) => {
+  state.modal.isOpen = true;
+  state.modal.isExpanding = true;
+  renderModal();
+  setTimeout(() => {
+    const secSelect = document.getElementById('nicSecSelect');
+    const newSecInput = document.getElementById('nicSecNew');
+    if (secSelect) {
+      const optionValue = section.startsWith('Cluster ') ? section : `Cluster ${section}`;
+      if ([...secSelect.options].some(opt => opt.value === optionValue)) {
+        secSelect.value = optionValue;
+        toggleNewSectionInput(optionValue);
+      } else {
+        secSelect.value = 'NEW_SECTION';
+        toggleNewSectionInput('NEW_SECTION');
+        if (newSecInput) newSecInput.value = section;
+      }
+    }
+    const rowInput = document.getElementById('nicRow');
+    const colInput = document.getElementById('nicCol');
+    if (rowInput) rowInput.value = row;
+    if (colInput) colInput.value = col;
+    suggestNicheID();
+  }, 100);
 };
 
 window.handleReleaseNiche = async (nicheId) => {
