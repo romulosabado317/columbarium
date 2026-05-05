@@ -870,13 +870,20 @@ function renderMapGridOnly() {
   container.style.gap = '12px';
 
   let gridHTML = '';
+  const isAdminOrStaff = state.role === 'ADMIN' || state.role === 'STAFF';
   for (let r = 1; r <= rows; r++) {
     for (let c = 1; c <= cols; c++) {
       const niche = filtered.find(n => n.row === r && n.col === c);
       if (!niche) {
-        gridHTML += `<button type="button" onclick="openAddNicheModal('${state.map.section}', ${r}, ${c})" class="w-24 h-24 rounded-xl bg-black/5 border border-dashed border-black/10 flex items-center justify-center opacity-70 hover:opacity-100 transition-all">
-        <i data-lucide="plus" class="w-4 h-4"></i>
-      </button>`;
+        if (isAdminOrStaff) {
+          gridHTML += `<button type="button" onclick="openAddNicheModal('${state.map.section}', ${r}, ${c})" class="w-24 h-24 rounded-xl bg-black/5 border border-dashed border-black/10 flex items-center justify-center opacity-70 hover:opacity-100 transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </button>`;
+        } else {
+          gridHTML += `<div class="w-24 h-24 rounded-xl bg-black/5 border border-dashed border-black/10 flex items-center justify-center opacity-30">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+          </div>`;
+        }
         continue;
       }
 
@@ -1246,6 +1253,12 @@ window.handleDeleteNiche = async (id) => {
 };
 
 window.openAddNicheModal = (section, row, col) => {
+  const isAdminOrStaff = state.role === 'ADMIN' || state.role === 'STAFF';
+  if (!isAdminOrStaff) {
+    alert('Only staff and admin may add niches. Please log in to continue.');
+    return;
+  }
+
   state.modal.isOpen = true;
   state.modal.isExpanding = true;
   renderModal();
@@ -1269,6 +1282,17 @@ window.openAddNicheModal = (section, row, col) => {
     if (colInput) colInput.value = col;
     suggestNicheID();
   }, 100);
+};
+
+window.openExpansionModal = () => {
+  const isAdminOrStaff = state.role === 'ADMIN' || state.role === 'STAFF';
+  if (!isAdminOrStaff) {
+    alert('Only staff and admin may add niches. Please log in to continue.');
+    return;
+  }
+  state.modal.isOpen = true;
+  state.modal.isExpanding = true;
+  renderModal();
 };
 
 window.handleReleaseNiche = async (nicheId) => {
